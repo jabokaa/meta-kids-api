@@ -25,14 +25,11 @@ class AuthController extends Controller
             'senha' => Hash::make($validated['senha']),
         ]);
 
-        $token = $user->createToken('api', ['*'], null)->plainTextToken;
-
-        return response()->json([
-            'message' => 'Usuário cadastrado com sucesso.',
-            'user' => $user,
-            'token' => $token,
-            'token_type' => 'Bearer',
-        ], 201);
+        return $this->authenticatedResponse(
+            user: $user,
+            message: 'Usuário cadastrado com sucesso.',
+            status: 201
+        );
     }
 
     public function login(Request $request): JsonResponse
@@ -68,13 +65,19 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = $user->createToken('api', ['*'], null)->plainTextToken;
+        return $this->authenticatedResponse(
+            user: $user,
+            message: 'Login realizado com sucesso.'
+        );
+    }
 
+    private function authenticatedResponse(User $user, string $message, int $status = 200): JsonResponse
+    {
         return response()->json([
-            'message' => 'Login realizado com sucesso.',
+            'message' => $message,
             'user' => $user,
-            'token' => $token,
+            'token' => $user->createToken('api', ['*'], null)->plainTextToken,
             'token_type' => 'Bearer',
-        ]);
+        ], $status);
     }
 }
