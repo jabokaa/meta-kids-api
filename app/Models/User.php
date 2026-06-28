@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -11,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 #[Hidden(['senha'])]
 class User extends Authenticatable
 {
+    use HasApiTokens, HasFactory;
+
     public $timestamps = true;
 
     protected $casts = [
