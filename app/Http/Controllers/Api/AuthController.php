@@ -15,13 +15,12 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'login' => ['required', 'string', 'max:255', 'unique:users,login'],
-            'codigo' => ['required', 'string', 'max:255', 'unique:users,codigo'],
             'senha' => ['required', 'string', 'min:6'],
         ]);
 
         $user = User::create([
             'login' => $validated['login'],
-            'codigo' => $validated['codigo'],
+            'codigo' => $this->generateCodigo(),
             'senha' => Hash::make($validated['senha']),
         ]);
 
@@ -51,11 +50,11 @@ class AuthController extends Controller
         $user = User::query()
             ->when(
                 $request->filled('login'),
-                fn ($query) => $query->where('login', $validated['login'])
+                fn($query) => $query->where('login', $validated['login'])
             )
             ->when(
                 ! $request->filled('login') && $request->filled('codigo'),
-                fn ($query) => $query->where('codigo', $validated['codigo'])
+                fn($query) => $query->where('codigo', $validated['codigo'])
             )
             ->first();
 
@@ -79,5 +78,14 @@ class AuthController extends Controller
             'token' => $user->createToken('api', ['*'], null)->plainTextToken,
             'token_type' => 'Bearer',
         ], $status);
+    }
+
+    private function generateCodigo(): string
+    {
+        do {
+            $codigo = sprintf('%03d-%03d', random_int(0, 999), random_int(0, 999));
+        } while (User::query()->where('codigo', $codigo)->exists());
+
+        return $codigo;
     }
 }
