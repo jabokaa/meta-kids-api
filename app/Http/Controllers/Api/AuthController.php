@@ -25,7 +25,7 @@ class AuthController extends Controller
             'senha' => Hash::make($validated['senha']),
         ]);
 
-        $token = $user->createToken('api')->plainTextToken;
+        $token = $user->createToken('api', ['*'], null)->plainTextToken;
 
         return response()->json([
             'message' => 'Usuário cadastrado com sucesso.',
@@ -68,9 +68,7 @@ class AuthController extends Controller
             ]);
         }
 
-        $user->tokens()->delete();
-
-        $token = $user->createToken('api')->plainTextToken;
+        $token = $user->createToken('api', ['*'], null)->plainTextToken;
 
         return response()->json([
             'message' => 'Login realizado com sucesso.',
