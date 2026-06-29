@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Grupo;
+use App\Models\LogroSemanal;
 use App\Models\Membro;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -72,6 +73,31 @@ class MembroController extends Controller
         $membro->delete();
 
         return response()->json(['message' => 'Membro removido.']);
+    }
+
+    /**
+     * Lista os logros semanais (estrelas) de um membro, com filtro opcional por meta.
+     * GET /membros/{membro}/logros-semanais?meta_id=X
+     */
+    public function logrosSemanais(Request $request, Membro $membro): JsonResponse
+    {
+        $this->authorizeGrupo($request, $membro->grupo);
+
+        $query = LogroSemanal::where('membro_id', $membro->id)
+            ->orderBy('semana_inicio', 'desc');
+
+        if ($request->filled('meta_id')) {
+            $query->where('meta_id', $request->integer('meta_id'));
+        }
+
+        $logros = $query->get()->map(fn($l) => [
+            'id'            => $l->id,
+            'membro_id'     => $l->membro_id,
+            'meta_id'       => $l->meta_id,
+            'semana_inicio' => $l->getRawOriginal('semana_inicio'),
+        ]);
+
+        return response()->json(['logros_semanais' => $logros]);
     }
 
     private function authorizeGrupo(Request $request, Grupo $grupo): void

@@ -32,6 +32,9 @@ Route::middleware('auth:sanctum')->group(function () {
         // Metas de um membro
         Route::get('/{membro}/metas',  [MetaController::class, 'index']);
         Route::post('/{membro}/metas', [MetaController::class, 'store']);
+
+        // Logros semanais (estrelas) de um membro
+        Route::get('/{membro}/logros-semanais', [MembroController::class, 'logrosSemanais']);
     });
 
     // Operações em meta individual

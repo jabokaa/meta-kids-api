@@ -42,4 +42,9 @@ class Meta extends Model
     {
         return $this->hasMany(Registro::class);
     }
+
+    public function logrosSemanas(): HasMany
+    {
+        return $this->hasMany(LogroSemanal::class);
+    }
 }
